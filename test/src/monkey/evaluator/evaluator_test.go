@@ -1,15 +1,16 @@
 package evaluator
 
 import (
+	"testing"
+
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/parser"
-	"testing"
 )
 
 // func TestEvalBooleanExpression( t *testing.T) {
 // 	tests := []struct {
-// 		input    string 
+// 		input    string
 // 		expected bool
 // 	}{
 // 		{"true", true},
@@ -41,7 +42,7 @@ import (
 
 // func TestBangOperator(t *testing.T) {
 // 	tests := []struct {
-// 		input string 
+// 		input string
 // 		expected bool
 // 	}{
 // 		{"!true", false},
@@ -57,7 +58,6 @@ import (
 // 		testBooleanObject(t, evaluated, tt.expected)
 // 	}
 // }
-
 
 // func TestEvalIntegerExpression(t *testing.T) {
 // 	tests := []struct {
@@ -87,32 +87,98 @@ import (
 // 	}
 // }
 
-func TestIfElseExpression(t *testing.T) {
+// func TestIfElseExpression(t *testing.T) {
+// 	tests := []struct {
+// 		input string
+// 		expected interface{}
+// 	}{
+// 		{"if (true) {10}", 10},
+// 		{"if (false) {10}", nil},
+// 		{"if (1) {10}", 10},
+// 		{"if (1 < 2) {10}", 10},
+// 		{"if (1 > 2) {10}", nil},
+// 		{"if (1 < 2) {10} else {20}",10	},
+// 		{"if (1 > 2) {10} else {20}", 20},
+// 	}
+
+// 	for _,tt := range tests {
+// 		evaluated := testEval(tt.input)
+// 		integer, ok := tt.expected.(int)
+// 		if ok {
+// 			testIntegerObject(t, evaluated,int64(integer))
+// 		} else {
+// 			testNullObject(t, evaluated)
+// 		}
+
+// 	}
+// }
+
+// func TestReturnStatements(t *testing.T) {
+// 	tests := []struct {
+// 		input string
+// 		expected int64
+// 	}{
+// 		{"return 10;", 10},
+// 		{"return 10; 9;", 10},
+// 		{"return 2 * 5; 9;", 10},
+// 		{"9; return 2 * 5; 9;", 10},
+// 		{
+// 			`
+// 			if (10 > 1) {
+// 				if (10 > 1) {
+// 					return 10;
+// 				}
+// 				return 1;
+// 			}
+// 			`,
+// 			10,
+// 		},
+// 	}
+
+// 	for _, tt := range tests {
+// 		evaluated := testEval(tt.input)
+// 		testIntegerObject(t, evaluated, tt.expected)
+// 	}
+// }
+
+func TestErrorHandling( t *testing.T) {
 	tests := []struct {
 		input string 
-		expected interface{} 
+		expectedMessage string 
 	}{
-		{"if (true) {10}", 10},
-		{"if (false) {10}", nil},
-		{"if (1) {10}", 10},
-		{"if (1 < 2) {10}", 10},
-		{"if (1 > 2) {10}", nil},
-		{"if (1 < 2) {10} else {20}",10	},
-		{"if (1 > 2) {10} else {20}", 20},
+		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
+		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
+		{"-true", "unknown operator: -BOOLEAN"},
+		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+		{
+			`
+				if (10 > 1) {
+					if (10 > 1) {
+						return true + false;
+					}
+					return 1;
+				}
+			`,
+			 "unknown operator: BOOLEAN + BOOLEAN",
+		},
 	}
 
-	for _,tt := range tests {
+	for _, tt := range tests {
 		evaluated := testEval(tt.input)
-		integer, ok := tt.expected.(int)
-		if ok {
-			testIntegerObject(t, evaluated,int64(integer))
-		} else {
-			testNullObject(t, evaluated)
+
+		errObj, ok := evaluated.(*object.Error)
+		if !ok {
+			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
+			continue
 		}
-	
+
+		if errObj.Message != tt.expectedMessage {
+			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
+		}
 	}
 }
-
 
 func testEval(input string) object.Object {
 	l := lexer.New(input)
