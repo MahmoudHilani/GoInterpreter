@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"monkey/token"
+	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/token"
 	"testing"
 )
 

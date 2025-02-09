@@ -2,7 +2,7 @@ package evaluator
 
 import (
 	"fmt"
-	"monkey/object"
+	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
 )
 
 var builtins = map[string]*object.Builtin{

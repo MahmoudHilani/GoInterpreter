@@ -3,7 +3,7 @@ package object
 import (
 	"bytes"
 	"fmt"
-	"monkey/ast"
+	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/ast"
 	"strings"
 )
 
