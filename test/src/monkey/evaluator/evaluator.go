@@ -57,7 +57,15 @@ func Eval(node ast.Node) object.Object {
 			return val
 		}
 		return &object.ReturnValue{Value: val}
+	
+	case *ast.LetStatement:
+		val := Eval(node.Value)
+		if isError(val) {
+			return val
+		}
 	}
+
+
 
 
 	return nil
@@ -208,6 +216,8 @@ func evalBlockStatement(block *ast.BlockStatement) object.Object {
 
 	return result
 }
+
+func evalLetStatement()
 
 func newError(format string, a ...interface{}) *object.Error {
 	return &object.Error{Message: fmt.Sprintf(format, a...)}
