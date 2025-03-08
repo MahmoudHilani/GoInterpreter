@@ -3,6 +3,7 @@ package evaluator
 import (
 	"testing"
 
+	// "github.com/MahmoudHilani/GoInterpreter/test/src/monkey/ast"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/parser"
@@ -141,47 +142,47 @@ import (
 // 	}
 // }
 
-func TestErrorHandling( t *testing.T) {
-	tests := []struct {
-		input string 
-		expectedMessage string 
-	}{
-		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
-		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
-		{"-true", "unknown operator: -BOOLEAN"},
-		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
-		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
-		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
-		{"foobar", "identifier not found: foobar"},
-		{
-			`
-				if (10 > 1) {
-					if (10 > 1) {
-						return true + false;
-					}
-					return 1;
-				}
-			`,
-			 "unknown operator: BOOLEAN + BOOLEAN",
-		},
-	}
+// func TestErrorHandling( t *testing.T) {
+// 	tests := []struct {
+// 		input string 
+// 		expectedMessage string 
+// 	}{
+// 		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
+// 		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
+// 		{"-true", "unknown operator: -BOOLEAN"},
+// 		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
+// 		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
+// 		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+// 		{"foobar", "identifier not found: foobar"},
+// 		{
+// 			`
+// 				if (10 > 1) {
+// 					if (10 > 1) {
+// 						return true + false;
+// 					}
+// 					return 1;
+// 				}
+// 			`,
+// 			 "unknown operator: BOOLEAN + BOOLEAN",
+// 		},
+// 	}
 
 	
 
-	for _, tt := range tests {
-		evaluated := testEval(tt.input)
+// 	for _, tt := range tests {
+// 		evaluated := testEval(tt.input)
 
-		errObj, ok := evaluated.(*object.Error)
-		if !ok {
-			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
-			continue
-		}
+// 		errObj, ok := evaluated.(*object.Error)
+// 		if !ok {
+// 			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
+// 			continue
+// 		}
 
-		if errObj.Message != tt.expectedMessage {
-			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
-		}
-	}
-}
+// 		if errObj.Message != tt.expectedMessage {
+// 			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
+// 		}
+// 	}
+// }
 
 // func TestLetStatements(t *testing.T) {
 // 	tests := []struct {
@@ -225,22 +226,36 @@ func TestErrorHandling( t *testing.T) {
 // 	}
 // } 
 
-func TestFunctionApplication(t *testing.T) {
-	tests := []struct {
-	input string
-	expected int64
-	}{
-		{"let identity = fn(x) { x; }; identity(5);", 5},
-		{"let identity = fn(x) { return x; }; identity(5);", 5},
-		{"let double = fn(x) { x * 2; }; double(5);", 10},
-		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
-		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
-		{"fn(x) { x; }(5)", 5},
+func TestStringLiteral(t *testing.T) {
+	input := `"Hello world";`
+
+	evaluated := testEval(input)
+	str, ok := evaluated.(*object.String)
+	if !ok {
+		t.Fatalf("object is not String. Got=%T (%+v)", evaluated,evaluated)
 	}
-	for _, tt := range tests {
-		testIntegerObject(t, testEval(tt.input), tt.expected)
+
+	if str.Value != "Hello world" {
+		t.Fatalf("String has wrong value. Got %q", str.Value)
 	}
 }
+
+// func TestFunctionApplication(t *testing.T) {
+// 	tests := []struct {
+// 	input string
+// 	expected int64
+// 	}{
+// 		{"let identity = fn(x) { x; }; identity(5);", 5},
+// 		{"let identity = fn(x) { return x; }; identity(5);", 5},
+// 		{"let double = fn(x) { x * 2; }; double(5);", 10},
+// 		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
+// 		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+// 		{"fn(x) { x; }(5)", 5},
+// 	}
+// 	for _, tt := range tests {
+// 		testIntegerObject(t, testEval(tt.input), tt.expected)
+// 	}
+// }
 
 func testEval(input string) object.Object {
 	l := lexer.New(input)

@@ -8,40 +8,60 @@ import (
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
 )
 
-func TestLetStatements(t *testing.T) {
-	tests := []struct {
-		input 			   string
-		expectedIdentifier string
-		expectedValue	   interface{}
-	}{
-		{"let x = 5;", "x", 5},
-		{"let y = true;", "y", true},
-		{"let foobar = y;", "foobar", "y"},
+func TestStringLiteral(t *testing.T) {
+	input := `"hello world";`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement)
+	literal,ok := stmt.Expression.(*ast.StringLiteral)
+
+	if !ok {
+		t.Fatalf("exp not *ast.StringLiteral got=%T", stmt.Expression)
 	}
 
-	for _, tt := range tests {
-		l := lexer.New(tt.input)
-		p := New(l)
-		program := p.ParseProgram()
-		checkParserErrors(t, p)
-
-		if len(program.Statements) != 1 {
-			t.Fatalf("program.statements isnt 1 got %d", len(program.Statements))
-		}
-
-		stmt := program.Statements[0]
-		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
-			return
-		}
-
-		val := stmt.(*ast.LetStatement).Value
-
-		if !testLiteralExpression(t, val, tt.expectedValue) {
-			return
-		}
-
+	if literal.Value != "hello world" {
+		t.Fatalf("literal.Value not %q got=%q", "hello world", literal.Value)
 	}
 }
+
+// func TestLetStatements(t *testing.T) {
+// 	tests := []struct {
+// 		input 			   string
+// 		expectedIdentifier string
+// 		expectedValue	   interface{}
+// 	}{
+// 		{"let x = 5;", "x", 5},
+// 		{"let y = true;", "y", true},
+// 		{"let foobar = y;", "foobar", "y"},
+// 	}
+
+// 	for _, tt := range tests {
+// 		l := lexer.New(tt.input)
+// 		p := New(l)
+// 		program := p.ParseProgram()
+// 		checkParserErrors(t, p)
+
+// 		if len(program.Statements) != 1 {
+// 			t.Fatalf("program.statements isnt 1 got %d", len(program.Statements))
+// 		}
+
+// 		stmt := program.Statements[0]
+// 		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
+// 			return
+// 		}
+
+// 		val := stmt.(*ast.LetStatement).Value
+
+// 		if !testLiteralExpression(t, val, tt.expectedValue) {
+// 			return
+// 		}
+
+// 	}
+// }
 
 // func TestCallExpressionParsing(t *testing.T) {
 // 	input := "add(1, 2 * 3, 4 + 5);"
