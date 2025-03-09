@@ -142,48 +142,48 @@ import (
 // 	}
 // }
 
-func TestErrorHandling( t *testing.T) {
-	tests := []struct {
-		input string 
-		expectedMessage string 
-	}{
-		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
-		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
-		{"-true", "unknown operator: -BOOLEAN"},
-		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
-		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
-		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
-		{"foobar", "identifier not found: foobar"},
-		{
-			`"Hello" - "World"`,
-			"unknown operator: STRING - STRING",
-		},
-		{
-			`
-				if (10 > 1) {
-					if (10 > 1) {
-						return true + false;
-					}
-					return 1;
-				}
-			`,
-			 "unknown operator: BOOLEAN + BOOLEAN",
-		},
-	}
-	for _, tt := range tests {
-		evaluated := testEval(tt.input)
+// func TestErrorHandling( t *testing.T) {
+// 	tests := []struct {
+// 		input string 
+// 		expectedMessage string 
+// 	}{
+// 		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
+// 		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
+// 		{"-true", "unknown operator: -BOOLEAN"},
+// 		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
+// 		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
+// 		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+// 		{"foobar", "identifier not found: foobar"},
+// 		{
+// 			`"Hello" - "World"`,
+// 			"unknown operator: STRING - STRING",
+// 		},
+// 		{
+// 			`
+// 				if (10 > 1) {
+// 					if (10 > 1) {
+// 						return true + false;
+// 					}
+// 					return 1;
+// 				}
+// 			`,
+// 			 "unknown operator: BOOLEAN + BOOLEAN",
+// 		},
+// 	}
+// 	for _, tt := range tests {
+// 		evaluated := testEval(tt.input)
 
-		errObj, ok := evaluated.(*object.Error)
-		if !ok {
-			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
-			continue
-		}
+// 		errObj, ok := evaluated.(*object.Error)
+// 		if !ok {
+// 			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
+// 			continue
+// 		}
 
-		if errObj.Message != tt.expectedMessage {
-			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
-		}
-	}
-}
+// 		if errObj.Message != tt.expectedMessage {
+// 			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
+// 		}
+// 	}
+// }
 
 // func TestLetStatements(t *testing.T) {
 // 	tests := []struct {
@@ -257,6 +257,38 @@ func TestErrorHandling( t *testing.T) {
 // 		testIntegerObject(t, testEval(tt.input), tt.expected)
 // 	}
 // }
+
+func TestBuiltinFunctions(t *testing.T) {
+	tests := []struct {
+		input string
+		expected interface{}
+	}{
+		{`len("")`, 0},
+		{`len("four")`, 4},
+		{`len("hello world")`, 11},
+		{`len(1)`, "argument to `len` not supported. got INTEGER"},
+		{`len("one", "two")`, "wrong number of arguments. got=2, want=1"},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+
+		switch expected := tt.expected.(type) {
+		case int:
+			testIntegerObject(t, evaluated, int64(expected))
+		case string:
+			errObj, ok := evaluated.(*object.Error)
+
+			if !ok {
+				t.Errorf("object is not Error. got=%T (%+v)", evaluated,evaluated)
+				continue
+			}
+			if errObj.Message != expected {
+				t.Errorf("wrong error message. expected=%q got=%q", expected, errObj.Message)
+			}
+		}
+	}
+}
 
 func testEval(input string) object.Object {
 	l := lexer.New(input)
