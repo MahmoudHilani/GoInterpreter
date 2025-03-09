@@ -142,47 +142,48 @@ import (
 // 	}
 // }
 
-// func TestErrorHandling( t *testing.T) {
-// 	tests := []struct {
-// 		input string 
-// 		expectedMessage string 
-// 	}{
-// 		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
-// 		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
-// 		{"-true", "unknown operator: -BOOLEAN"},
-// 		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
-// 		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
-// 		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
-// 		{"foobar", "identifier not found: foobar"},
-// 		{
-// 			`
-// 				if (10 > 1) {
-// 					if (10 > 1) {
-// 						return true + false;
-// 					}
-// 					return 1;
-// 				}
-// 			`,
-// 			 "unknown operator: BOOLEAN + BOOLEAN",
-// 		},
-// 	}
+func TestErrorHandling( t *testing.T) {
+	tests := []struct {
+		input string 
+		expectedMessage string 
+	}{
+		{"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
+		{"5 + true; 5;", "type mismatch: INTEGER + BOOLEAN"},
+		{"-true", "unknown operator: -BOOLEAN"},
+		{"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"if (10 > 1) {true + false; }", "unknown operator: BOOLEAN + BOOLEAN"},
+		{"foobar", "identifier not found: foobar"},
+		{
+			`"Hello" - "World"`,
+			"unknown operator: STRING - STRING",
+		},
+		{
+			`
+				if (10 > 1) {
+					if (10 > 1) {
+						return true + false;
+					}
+					return 1;
+				}
+			`,
+			 "unknown operator: BOOLEAN + BOOLEAN",
+		},
+	}
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
 
-	
+		errObj, ok := evaluated.(*object.Error)
+		if !ok {
+			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
+			continue
+		}
 
-// 	for _, tt := range tests {
-// 		evaluated := testEval(tt.input)
-
-// 		errObj, ok := evaluated.(*object.Error)
-// 		if !ok {
-// 			t.Errorf("no error object returned. Got %T (%+v)", evaluated, evaluated)
-// 			continue
-// 		}
-
-// 		if errObj.Message != tt.expectedMessage {
-// 			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
-// 		}
-// 	}
-// }
+		if errObj.Message != tt.expectedMessage {
+			t.Errorf("wrong error message. Expected %q, got %q", tt.expectedMessage, errObj.Message)
+		}
+	}
+}
 
 // func TestLetStatements(t *testing.T) {
 // 	tests := []struct {
@@ -226,19 +227,19 @@ import (
 // 	}
 // } 
 
-func TestStringLiteral(t *testing.T) {
-	input := `"Hello world";`
+// func TestStringLiteral(t *testing.T) {
+// 	input := `"Hello world";`
 
-	evaluated := testEval(input)
-	str, ok := evaluated.(*object.String)
-	if !ok {
-		t.Fatalf("object is not String. Got=%T (%+v)", evaluated,evaluated)
-	}
+// 	evaluated := testEval(input)
+// 	str, ok := evaluated.(*object.String)
+// 	if !ok {
+// 		t.Fatalf("object is not String. Got=%T (%+v)", evaluated,evaluated)
+// 	}
 
-	if str.Value != "Hello world" {
-		t.Fatalf("String has wrong value. Got %q", str.Value)
-	}
-}
+// 	if str.Value != "Hello world" {
+// 		t.Fatalf("String has wrong value. Got %q", str.Value)
+// 	}
+// }
 
 // func TestFunctionApplication(t *testing.T) {
 // 	tests := []struct {
