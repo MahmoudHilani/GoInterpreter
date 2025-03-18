@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/evaluator"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
+	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/parser"
 )
 

@@ -8,7 +8,7 @@ import (
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/repl"
 )
 
-func main() {
+func mmain() {
 	user, err := user.Current()
 	if err != nil {
 		panic(err)
