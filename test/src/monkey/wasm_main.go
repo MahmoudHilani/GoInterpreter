@@ -2,57 +2,57 @@
 // +build js,wasm
 
 // wasm_main.go
-package main
+// package main
 
-import (
-	"strings"
-	"syscall/js"
+// import (
+// 	"strings"
+// 	"syscall/js"
 
-	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/evaluator"
-	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
-	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
-	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/parser"
-)
+// 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/evaluator"
+// 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
+// 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
+// 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/parser"
+// )
 
-func main() {
-	c := make(chan struct{})
+// func main() {
+// 	c := make(chan struct{})
 	
-	// Register JavaScript functions
-	js.Global().Set("goInterpret", js.FuncOf(interpret))
+// 	// Register JavaScript functions
+// 	js.Global().Set("goInterpret", js.FuncOf(interpret))
 	
-	<-c
-}
+// 	<-c
+// }
 
-func interpret(this js.Value, args []js.Value) interface{} {
-	if len(args) < 1 {
-		return "Error: No code provided"
-	}
+// func interpret(this js.Value, args []js.Value) interface{} {
+// 	if len(args) < 1 {
+// 		return "Error: No code provided"
+// 	}
 	
-	code := args[0].String()
+// 	code := args[0].String()
 	
-	// Set up the environment
-	env := object.NewEnvironment()
+// 	// Set up the environment
+// 	env := object.NewEnvironment()
 	
-	// Create lexer and parser
-	l := lexer.New(code)
-	p := parser.New(l)
+// 	// Create lexer and parser
+// 	l := lexer.New(code)
+// 	p := parser.New(l)
 	
-	// Parse the program
-	program := p.ParseProgram()
+// 	// Parse the program
+// 	program := p.ParseProgram()
 	
-	// Check for parser errors
-	if len(p.Errors()) != 0 {
-		errorMessages := strings.Join(p.Errors(), "\n")
-		return "Parser Errors:\n" + errorMessages
-	}
+// 	// Check for parser errors
+// 	if len(p.Errors()) != 0 {
+// 		errorMessages := strings.Join(p.Errors(), "\n")
+// 		return "Parser Errors:\n" + errorMessages
+// 	}
 	
-	// Evaluate the program
-	evaluated := evaluator.Eval(program, env)
+// 	// Evaluate the program
+// 	evaluated := evaluator.Eval(program, env)
 	
-	// Return the result
-	if evaluated != nil {
-		return evaluated.Inspect()
-	}
+// 	// Return the result
+// 	if evaluated != nil {
+// 		return evaluated.Inspect()
+// 	}
 	
-	return "null"
-}
+// 	return "null"
+// }
