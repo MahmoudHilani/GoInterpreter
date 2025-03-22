@@ -18,7 +18,7 @@ func Start(in io.Reader, out io.Writer) {
 	env := object.NewEnvironment()
 
 	for {
-		fmt.Printf(PROMPT)
+		fmt.Print(PROMPT)
 		scanned := scanner.Scan()
 		if !scanned {
 			return
@@ -43,9 +43,8 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-func StartAPI(in string, env *object.Environment) string{
-
-		fmt.Printf(PROMPT)
+func StartAPI(in string, env *object.Environment) string {
+		fmt.Print(PROMPT)
 		l := lexer.New(in)
 		p := parser.New(l)
 

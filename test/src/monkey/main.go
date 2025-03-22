@@ -44,15 +44,13 @@ func handleInterpret(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)	
 	}
 
-
-
 	var req InterpretRequest
 	err := json.NewDecoder(r.Body).Decode(&req); 
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
+	log.Println(req.Code)
 	env := object.NewEnvironment()
 	result := repl.StartAPI(req.Code, env)
 
