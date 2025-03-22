@@ -44,22 +44,21 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 func StartAPI(in string, env *object.Environment) string{
-	for {
+
 		fmt.Printf(PROMPT)
 		l := lexer.New(in)
 		p := parser.New(l)
 
 		program := p.ParseProgram()
 		if len(p.Errors()) != 0 {
-			printParserErrorsAPI(p.Errors())
-			continue
+			return printParserErrorsAPI(p.Errors())
 		}
 
 		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			return evaluated.Inspect()
 		}
-	}
+	return "No result"
 }
 
 const MONKEY_FACE = `        __,__
@@ -84,7 +83,7 @@ func printParserErrors(out io.Writer, errors []string) {
 }
 
 func printParserErrorsAPI(errors []string) string {
-	
+
 
 	out := strings.Join(errors, "\n")
 	return out
