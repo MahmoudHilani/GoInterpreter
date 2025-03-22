@@ -88,12 +88,6 @@ func handleInterpret(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("Received code: '%s'", req.Code)
 	
-	if req.Code == "" {
-		log.Printf("Received empty code")
-		http.Error(w, "No code provided", http.StatusBadRequest)
-		return
-	}
-	
 	env := object.NewEnvironment()
 	result := repl.StartAPI(req.Code, env)
 	log.Printf("Interpretation result: %s", result)
