@@ -33,7 +33,7 @@ import (
 )
 
 type InterpretRequest struct {
-	Code string `json:"code"`
+	Code string `json:code`
 }
 
 type InterpretResponse struct {
