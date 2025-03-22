@@ -21,7 +21,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -40,29 +42,66 @@ type InterpretResponse struct {
 }
 
 func handleInterpret(w http.ResponseWriter, r *http.Request) {
+	// Set CORS headers for all responses
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	
+	// Handle preflight OPTIONS request
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	
 	if r.Method != http.MethodPost {
+		log.Printf("Invalid method: %s", r.Method)
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return	
 	}
 
-	var req InterpretRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
+	// Debug request
+	log.Printf("Content-Type: %s", r.Header.Get("Content-Type"))
+	log.Printf("Request length: %d", r.ContentLength)
+	
+	// Read the entire body for debugging and processing
+	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		log.Printf("Error reading body: %v", err)
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
 		return
 	}
-	log.Println("Received code:", req.Code)
+	r.Body.Close()
+	
+	// Log the raw body
+	log.Printf("Raw request body (%d bytes): %s", len(bodyBytes), string(bodyBytes))
+	
+	// Create a new reader with the same body for JSON decoding
+	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	var req InterpretRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		log.Printf("JSON decode error: %v", err)
+		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	log.Printf("Received code: '%s'", req.Code)
+	
+	if req.Code == "" {
+		log.Printf("Received empty code")
+		http.Error(w, "No code provided", http.StatusBadRequest)
+		return
+	}
 	
 	env := object.NewEnvironment()
 	result := repl.StartAPI(req.Code, env)
+	log.Printf("Interpretation result: %s", result)
 
 	resp := InterpretResponse{
 		Result: result,
 	}
 	
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
 	json.NewEncoder(w).Encode(resp)
 }
 
