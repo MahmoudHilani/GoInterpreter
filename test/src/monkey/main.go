@@ -21,9 +21,9 @@
 package main
 
 import (
-	"bytes"
+	
 	"encoding/json"
-	"io"
+
 	"log"
 	"net/http"
 	"os"
@@ -64,23 +64,8 @@ func handleInterpret(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Content-Type: %s", r.Header.Get("Content-Type"))
 	log.Printf("Request length: %d", r.ContentLength)
 	
-	// Read the entire body for debugging and processing
-	bodyBytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("Error reading body: %v", err)
-		http.Error(w, "Error reading request body", http.StatusBadRequest)
-		return
-	}
-	r.Body.Close()
-	
-	// Log the raw body
-	log.Printf("Raw request body (%d bytes): %s", len(bodyBytes), string(bodyBytes))
-	
-	// Create a new reader with the same body for JSON decoding
-	r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
-
 	var req InterpretRequest
-	err = json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Printf("JSON decode error: %v", err)
 		http.Error(w, "Invalid request body: "+err.Error(), http.StatusBadRequest)
