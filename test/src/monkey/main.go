@@ -24,7 +24,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-    "os"
+	"os"
 
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/object"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/repl"
@@ -41,16 +41,18 @@ type InterpretResponse struct {
 
 func handleInterpret(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)	
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return	
 	}
 
 	var req InterpretRequest
-	err := json.NewDecoder(r.Body).Decode(&req); 
+	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	log.Println(req.Code)
+	log.Println("Received code:", req.Code)
+	
 	env := object.NewEnvironment()
 	result := repl.StartAPI(req.Code, env)
 
