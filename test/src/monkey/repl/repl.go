@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/evaluator"
 	"github.com/MahmoudHilani/GoInterpreter/test/src/monkey/lexer"
@@ -45,6 +46,7 @@ func Start(in io.Reader, out io.Writer) {
 
 func StartAPI(in string, env *object.Environment) string {
 		fmt.Print(PROMPT)
+		log.Println(in)
 		l := lexer.New(in)
 		p := parser.New(l)
 
