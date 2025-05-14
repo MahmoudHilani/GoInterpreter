@@ -134,8 +134,8 @@ func printParserErrors(out io.Writer, errors []string) {
 }
 
 func printParserErrorsAPI(errors []string, c *websocket.Conn) {
-	e := strings.Join(errors, "\n")
-	out := MONKEY_FACE + "Woops! We ran into some monkey business here!\n" + e
+	e := strings.Join(errors, "\r\n")
+	out := MONKEY_FACE + "Woops! We ran into some monkey business here!\r\n" + e
 	resp := InterpretResponse{
 		Result: out,
 	}
