@@ -112,7 +112,8 @@ func StartAPI(c *websocket.Conn)  {
 	
 }
 
-const MONKEY_FACE = `        __,__
+const MONKEY_FACE = `
+	         __,__
 	 .---. .-"   "-. .---.
 	/ .. \/ .-. .-. \/ .. \
    |  |  ' | / Y \ | '  |  |
@@ -135,7 +136,8 @@ func printParserErrors(out io.Writer, errors []string) {
 
 func printParserErrorsAPI(errors []string, c *websocket.Conn) {
 	e := strings.Join(errors, "\r\n")
-	out := MONKEY_FACE + "Woops! We ran into some monkey business here!\r\n" + e
+	monkeyFace := strings.ReplaceAll(MONKEY_FACE, "\n", "\r\n")
+	out := monkeyFace + "Woops! We ran into some monkey business here!\r\n" + e
 	resp := InterpretResponse{
 		Result: out,
 	}
